@@ -1,0 +1,8 @@
+.scroll{
+    overflow-y: scroll;
+    width: 100%;
+    height: 44vh;
+    overflow-y: scroll;
+    padding-right: 17px;
+    box-sizing: content-box;
+}

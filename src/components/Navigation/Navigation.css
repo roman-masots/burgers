@@ -1,0 +1,13 @@
+nav{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    height: 7rem;
+    color: white;
+    margin-top: -2rem;
+}
+
+.venuesP{
+    font-size: 3.75rem;
+    font-weight: 600;
+}
