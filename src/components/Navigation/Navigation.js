@@ -1,22 +1,20 @@
 import React from 'react';
 import './Navigation.css'
 
-const Navigation = ({ venues }) => {
-    return !venues.length ?
-        (
+class Navigation extends React.Component {
+    loading = (e) => {
+        if (this.props.venues.length) {
+            document.getElementById('loadingP').style.display = 'none';
+        }
+    }
+    render() {
+        return (
             <nav>
                 <p className='venuesP'>Venues</p>
-                <p>Gathering data...</p>
+                <p id='loadingP' onLoad={this.loading(this)}>Gathering data...</p>
             </nav>
         )
-        :
-        (
-            <nav>
-                <p className='venuesP'>Venues</p>
-
-            </nav>
-        )
-
+    }
 }
 
 export default Navigation;

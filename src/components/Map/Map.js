@@ -16,7 +16,7 @@ class Map extends React.Component {
 
     componentDidMount() {
         if (!window.google) {
-            const googleApi = 'GOOGLE_MAP_API_key';
+            const googleApi = `${process.env.REACT_APP_GOOGLE_MAP_key}`;
             const s = document.createElement('script');
             s.type = 'text/javascript';
             s.src = 'https://maps.google.com/maps/api/js?key=' + googleApi;

@@ -30,8 +30,8 @@ class App extends Component {
     const venueDistance = 1000; // Distance in meters from where to start looking for venues
 
     const venuesParams = {
-      client_id: 'FOURSQUARE_client_id_key',
-      client_secret: 'FOURSQUARE_client_secret_key',
+      client_id: `${process.env.REACT_APP_FOURSQUARE_client_id}`,
+      client_secret: `${process.env.REACT_APP_FOURSQUARE_client_secret}`,
       radius: 5000, // The search radius from our position
       limit: 50, // The max number of venues to load
       query: 'burgers', // The type of venues we want to query
@@ -39,87 +39,43 @@ class App extends Component {
       ll: `${this.state.position.lat},${this.state.position.lng}` // The latitude and longitude
     };
 
-    await fetch(venuesEndpoint + new URLSearchParams(venuesParams), {
-      method: 'GET'
-    })
+    await fetch(venuesEndpoint + new URLSearchParams(venuesParams))
       .then(response => response.json())
       .then(response => {
         response.response.groups[0].items.forEach(v => {
+
           // If distance is over 1000m from our position, then get venue last photo and update venues state
           if (v.venue.location.distance > venueDistance) {
-            fetch(`${venuesPictures}${v.venue.id}/photos?client_id=${venuesParams.client_id}&client_secret=${venuesParams.client_secret}&v=${venuesParams.v}`, {
-              method: 'GET'
-            })
-              .then(response => response.json())
-              .then(response => {
-                (response.response.photos.items.length > 0)
-                  ?
-                  //  Photo with index 0 is always the newest one
-                  v.venuePhoto = `${response.response.photos.items[0].prefix}${photoSize}${response.response.photos.items[0].suffix}`
-                  :
-                  v.venuePhoto = null;
-
-                // Updateing venues state with new venue
-                this.setState(prevState => ({
-                  venues: [...prevState.venues, v]
-                }))
-              })
-
-            // Google Markers:
-            var marker = new window.google.maps.Marker({
-              position: { lat: v.venue.location.lat, lng: v.venue.location.lng },
-              map: map,
-              animation: window.google.maps.Animation.DROP
-            });
-
-            var infoWindow = new window.google.maps.InfoWindow({
-              content: v.venue.name
-            });
-
-            // On marker click
-            window.google.maps.event.addListener(marker, 'click', () => {
-              if (!marker.open) {
-                infoWindow.open(map, marker);
-                marker.open = true;
-              }
-              else {
-                infoWindow.close();
-                marker.open = false;
-              }
-
-            });
-
-            // On map click
-            window.google.maps.event.addListener(map, 'click', () => {
-              infoWindow.close();
-              marker.open = false;
-            });
+            this.getVenuesPhotos(v, venuesPictures, venuesParams, photoSize);
+            this.setGoogleMarkers(map, v);
           }
         })
       })
   }
 
-  /* getCard = (cardElement) => {
-    const map = document.getElementById('myMap');
-    const venueById = this.state.venues.filter(venue => venue.venue.id === cardElement.getAttribute('id'))
-    console.log('venue by card element id:', venueById[0]);
-    console.log('selected card element:', cardElement);
+  getVenuesPhotos = (v, venuesPictures, venuesParams, photoSize) => {
+    fetch(`${venuesPictures}${v.venue.id}/photos?client_id=${venuesParams.client_id}&client_secret=${venuesParams.client_secret}&v=${venuesParams.v}`)
+      .then(response => response.json())
+      .then(response => {
+        v.venuePhoto = (response.response.photos.items.length > 0) ? `${response.response.photos.items[0].prefix}${photoSize}${response.response.photos.items[0].suffix}` : null
 
+        // Updateing venues state with new venue
+        this.setState(prevState => ({
+          venues: [...prevState.venues, v]
+        }))
+      })
+  }
 
-    window.google.maps.event.addDomListener(cardElement, 'click', () => {
-      console.log('venueById', venueById);
-      console.log('click', cardElement);
-    });
-
+  setGoogleMarkers = (map, v) => {
     // Google Markers:
     var marker = new window.google.maps.Marker({
-      position: { lat: venueById[0].venue.location.lat, lng: venueById[0].venue.location.lng },
+      position: { lat: v.venue.location.lat, lng: v.venue.location.lng },
       map: map,
       animation: window.google.maps.Animation.DROP
     });
 
     var infoWindow = new window.google.maps.InfoWindow({
-      content: venueById[0].venue.name
+      content: v.venue.name
     });
 
     // On marker click
@@ -132,7 +88,6 @@ class App extends Component {
         infoWindow.close();
         marker.open = false;
       }
-      console.log(marker);
 
     });
 
@@ -141,7 +96,7 @@ class App extends Component {
       infoWindow.close();
       marker.open = false;
     });
-  } */
+  }
 
   render() {
     const { position, circle, venues } = this.state;
