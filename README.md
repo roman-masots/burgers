@@ -5,3 +5,5 @@ REACT_APP_FOURSQUARE_client_secret = key2
 REACT_APP_GOOGLE_MAP_key = key3
 
 3. Run npm start
+
+You can find this app on Heroku: https://secure-bastion-67120.herokuapp.com/
